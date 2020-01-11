@@ -17,10 +17,7 @@ package org.apenk.surito.aide;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>操作 {@link Object} 的工具类。</p>
@@ -495,8 +492,28 @@ public class ObjectAide {
 
     // TODO-Kweny go on
 //    public static <T extends Comparable<? super T>> T median(final T... values) {
-//
+//        final TreeSet<T> sort = new TreeSet<>();
+//        "".equalsIgnoreCase()
+//        sort.add(null);
 //    }
+
+    // TODO-Kweny comments
+    @SafeVarargs
+    public static <T extends Comparable<? super T>> T medianIgnoreNull(final T... values) {
+        if (values == null || values.length == 0) {
+            return null;
+        }
+        final TreeSet<T> sort = new TreeSet<>();
+        for (T value : values) {
+            if (value == null) {
+                continue;
+            }
+            sort.add(value);
+        }
+        @SuppressWarnings("unchecked")
+        final T result = (T) sort.toArray()[(sort.size() - 1) / 2];
+        return result;
+    }
 
     /**
      * <p>如果参数 {@code a} 和 {@code b} 相等（==），则返回 0，否则使用参数 {@code comparator} 指定的比较器进行运算并返回。</p>
@@ -552,6 +569,31 @@ public class ObjectAide {
                 }
             }
         }
+        return result;
+    }
+
+    // TODO-Kweny go on
+//    public static <T> T median(Comparator<? super T> comparator, final T... values) {
+//        final TreeSet<T> sort = new TreeSet<>();
+//        "".equalsIgnoreCase()
+//        sort.add(null);
+//    }
+
+    // TODO-Kweny comments
+    @SafeVarargs
+    public static <T> T medianIgnoreNull(Comparator<? super T> comparator, final T... values) {
+        if (values == null || values.length == 0) {
+            return null;
+        }
+        final TreeSet<T> sort = new TreeSet<>(comparator);
+        for (T value : values) {
+            if (value == null) {
+                continue;
+            }
+            sort.add(value);
+        }
+        @SuppressWarnings("unchecked")
+        final T result = (T) sort.toArray()[(sort.size() - 1) / 2];
         return result;
     }
     // ------ Compare ------ ending
