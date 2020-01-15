@@ -16,6 +16,7 @@
 package org.apenk.surito.aide;
 
 import org.apenk.surito.aide.exception.CloneFailedException;
+import org.apenk.surito.aide.mutable.MutableInt;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -524,7 +525,7 @@ public class ObjectAide {
      */
     @SafeVarargs
     public static <T extends Comparable<? super T>> T medianIgnoreNull(final T... items) {
-        if (items == null || items.length == 0) {// TODO-Kweny ArrayAide.isEmpty
+        if (ArrayAide.isEmpty(items)) {
             return null;
         }
         final TreeSet<T> sort = new TreeSet<>();
@@ -632,15 +633,14 @@ public class ObjectAide {
     public static <T> T medianIgnoreNull(Comparator<? super T> comparator, final T... items) {
         // TODO-Kweny Validate
 //        Validate.notNull(comparator, "null comparator");
-        if (items == null || items.length == 0) { // TODO-Kweny ArrayAide.isEmpty
+        if (ArrayAide.isEmpty(items)) {
             return null;
         }
         final TreeSet<T> sort = new TreeSet<>(comparator);
         for (T item : items) {
-            if (item == null) {
-                continue;
+            if (item != null) {
+                sort.add(item);
             }
-            sort.add(item);
         }
         @SuppressWarnings("unchecked")
         final T result = (T) sort.toArray()[(sort.size() - 1) / 2];
@@ -652,13 +652,32 @@ public class ObjectAide {
 
     // ----- Mode ----- beginning
     /**
-     * @param items
-     * @param <T>
-     * @return
+     * <p>从指定集合中查找最多出现的元素。如果集合为空，或有多个出现次数一样的元素，则返回 {@code null}。</p>
+     *
+     * @param items 指定集合
+     * @param <T> 元素类型
+     * @return 出现次数最多的元素，如果非唯一或集合为空，则返回 {@code null}
      */
+    @SafeVarargs
     public static <T> T mode(final T... items) {
-        if (items != null && items.length > 0) { // TODO-Kweny ArrayAide.isNotEmpty
-            // TODO-Kweny ObjectAide.mode
+        if (ArrayAide.isNotEmpty(items)) {
+            final HashMap<T, MutableInt> occurrences = new HashMap<>(items.length);
+            for (final T item : items) {
+                final MutableInt count = occurrences.computeIfAbsent(item, k -> new MutableInt(0));
+                count.increment();
+            }
+            T result = null;
+            int max = 0;
+            for (final Map.Entry<T, MutableInt> entry : occurrences.entrySet()) {
+                final int cmp = entry.getValue().intValue();
+                if (cmp == max) {
+                    result = null;
+                } else if (cmp > max) {
+                    max = cmp;
+                    result = entry.getKey();
+                }
+            }
+            return result;
         }
         return null;
     }
